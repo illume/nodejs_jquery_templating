@@ -1,0 +1,2 @@
+{"foo":"Hi.  this is data from sample.json rendered on the client side when no serverside js is involved.  This is NOT shown when rendered from the server side.", 
+ "foo2":"there"}

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html> 
+<body> 
+
+hi there.  
+
+
+<div class="result"></div>
+<div class="result2"></div>
+
+
+
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="yourServerSide.js"></script>
+<script type="text/javascript">
+	$(document).ready(function(){
+
+		var sampleJSON = 'sample.json';
+		var yourReadyCode = function () {
+			// Rest of your code here.
+			$('.result2').text('this is from the client side');
+		};
+
+		if(window._processedServerSide === undefined) {
+			$.getJSON(sampleJSON, function(data) {
+				window._renderServerSide(data);
+				yourReadyCode();
+			});
+		} else {
+			yourReadyCode();
+		}
+
+
+	});
+
+</script>
+</body> 
+</html>
