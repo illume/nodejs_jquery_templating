@@ -19,15 +19,22 @@ Put your server side templating in yourServerSide.js
 
 Dependencies.
 
+requires jsdom and node-htmlparser
 
-// requires jsdom and node-htmlparser
-//   git clone http://github.com/tautologistics/node-htmlparser.git
-//   git clone http://github.com/tmpvar/jsdom.git
-//   mkdir -p ~/.node_libraries/
-//   mkdir -p ~/.node_libraries/node-htmlparser
-//   cp -a node-htmlparser/lib/node-htmlparser.js ~/.node_libraries/node-htmlparser
-//   cp -a jsdom/lib/jsdom ~/.node_libraries/
-//   - ~/.node_libraries/node-htmlparser/node-htmlparser
-//   - ~/.node_libraries/jsdom
+git clone http://github.com/tautologistics/node-htmlparser.git
+
+git clone http://github.com/tmpvar/jsdom.git
+
+mkdir -p ~/.node_libraries/
+
+mkdir -p ~/.node_libraries/node-htmlparser
+
+cp -a node-htmlparser/lib/node-htmlparser.js ~/.node_libraries/node-htmlparser
+
+cp -a jsdom/lib/jsdom ~/.node_libraries/
+
+- ~/.node_libraries/node-htmlparser/node-htmlparser
+
+- ~/.node_libraries/jsdom
 
 
