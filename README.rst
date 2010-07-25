@@ -4,6 +4,18 @@ Using json as the data.
 
 Uses nodejs for the javascript interpreter, and jquery for the template language, along with jsdom and node-htmlparser for the DOM and html parsing/serialising.
 
+Why is this useful?
+===================
+
+- No need for a server to process the templates.  Either process them server side or client side.
+
+- Data can be stored in a json file.  No need for a database for testing.  Just create json files in a text file.
+
+- Can reuse knowledge of javascript libraries (like jquery), rather than learning one of 798394 different templating languages.
+
+- Can keep one html file which front end web developers can edit without them needing a new template file.
+
+
 
 To process the data on the server side.
 
