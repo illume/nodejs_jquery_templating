@@ -2,7 +2,8 @@ For template processing using jquery on the server side or the client side.
 Using json as the data.
 
 
-See top of run.js for dependencies.
+Uses nodejs for the javascript interpreter, and jquery for the template language, along with jsdom and node-htmlparser for the DOM and html parsing/serialising.
+
 
 To process the data on the server side.
 
