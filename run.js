@@ -18,6 +18,7 @@ var htmlparser = require("node-htmlparser/node-htmlparser");
 
 var dom = require("jsdom/level1/core").dom.level1.core;
 var window = require("jsdom/browser").windowAugmentation(dom).window;
+var domToHtml = require("jsdom/browser/domtohtml").domToHtml;
 
 var Script = process.binding('evals').Script;
 
@@ -27,8 +28,6 @@ var jsonUrl = "server.json";
 var serverUrl = "yourServerSide.js";
 var templateUrl = "index.html";
 
-// Hack... see below.
-var docType = "";
 
 
 var readFiles = function (files, whenDone) {
@@ -71,13 +70,26 @@ var theFileNames = [__dirname + "/jquery.js",
 			__dirname + "/" + jsonUrl];
 
 
-// TODO LATER: cache files if we have already read them.  Not too slow for now.
-readFiles(theFileNames, function (theErrs, theFiles) {
+var extractDoctype = function (htmlData)  {
+	var html = htmlData + "";
+	var idx = html.indexOf('<html');
+	if (idx === -1) {
+		var idx = html.indexOf('<HTML');
+	}
+	return html.substr(0, idx);
+}
 
-	var data = theFiles[theFileNames[0]];
-	var serverSideData = theFiles[theFileNames[1]];
-	var htmlData = theFiles[theFileNames[2]];
-	var jsonData = theFiles[theFileNames[3]];
+// TODO LATER: cache files if we have already read them.  Not too slow for now.
+readFiles(theFileNames, function (theErrs, theDatas) {
+
+	var data = theDatas[theFileNames[0]];
+	var serverSideData = theDatas[theFileNames[1]];
+	var htmlData = theDatas[theFileNames[2]];
+	var jsonData = theDatas[theFileNames[3]];
+
+        //HACK TODO: extract the doctype from the document... since it is not output by the dom.
+	// extract everything before '<html'
+	var docType = extractDoctype(htmlData);
 
 
 	//sys.puts(data);
@@ -116,7 +128,11 @@ readFiles(theFileNames, function (theErrs, theFiles) {
 	// TODO: this fails with an error...
 	//window.jQuery('body').append("<script type='text/javascript'>window._processedServerSide = true;</script>");
 
+	//TODO: can use the dom directly to create the output html?
 	var outputHtml = window.document.outerHTML;
+	//var outputHtml = domToHtml(window.document);
+	//docType = window.document.doctype;
+
 
 	//HACK: since the doc type is not output, we add it in here.
 	outputHtml = docType + outputHtml;
