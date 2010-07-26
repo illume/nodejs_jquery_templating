@@ -22,6 +22,7 @@ hi there.
 		};
 
 		if(window._processedServerSide === undefined) {
+			// We have not processed it server side, so we run it client side.
 			$.getJSON(clientJSON, function(data) {
 				window._renderServerSide(data);
 				yourReadyCode();
