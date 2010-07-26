@@ -140,7 +140,7 @@ var doIt = function (theFileNames, outPut) {
 
 
 
-if (1) {
+if (0) {
 	// Run, then exit.
 
 	var jsonUrl = "server.json";
@@ -211,7 +211,7 @@ if (1) {
 		}
 	}).listen(8124, "127.0.0.1");
 	console.log('Server running at http://127.0.0.1:8124/');
-	console.log('try url: http://localhost:8124/serverJson=server.json&serverJs=yourServerSide.js&templateUrl=index.html')
+	console.log('try url: http://localhost:8124/?serverJson=server.json&serverJs=yourServerSide.js&templateUrl=index.html')
 
 
 
