@@ -26,9 +26,14 @@ How to run.
 
 Look at index.html in your browser, to process client side.
 
-To process the data on the server side.
-
+To process the data on the server side:
     node run.js > processed_index.html
+
+To run as a server:
+    node run.js --server
+Open your browser to:
+    http://localhost:8124/?serverJson=server.json&serverJs=yourServerSide.js&templateUrl=index.html
+
 
 Put your server side templating code in yourServerSide.js
 

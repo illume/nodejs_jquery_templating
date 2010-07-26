@@ -1,4 +1,8 @@
 
+// To output to stdout:
+// 	node run.js
+// To run as a server:
+// 	node run.js --server
 
 
 
@@ -139,8 +143,12 @@ var doIt = function (theFileNames, outPut) {
 }
 
 
+var runAsServer = false;
+if (process.argv.length === 3 && process.argv[2] == "--server") {
+	runAsServer = true;
+}
 
-if (0) {
+if (!runAsServer) {
 	// Run, then exit.
 
 	var jsonUrl = "server.json";
@@ -212,8 +220,6 @@ if (0) {
 	}).listen(8124, "127.0.0.1");
 	console.log('Server running at http://127.0.0.1:8124/');
 	console.log('try url: http://localhost:8124/?serverJson=server.json&serverJs=yourServerSide.js&templateUrl=index.html')
-
-
 
 }
 
