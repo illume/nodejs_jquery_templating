@@ -15,7 +15,9 @@ Why is this useful?
 
 
 A couple of blog posts about it.
+
 - http://renesd.blogspot.com/2007/08/javascript-for-templates-its-happening.html
+
 - http://renesd.blogspot.com/2010/05/you-are-using-wrong-templating-system.html
 
 
