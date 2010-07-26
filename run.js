@@ -22,13 +22,6 @@ var domToHtml = require("jsdom/browser/domtohtml").domToHtml;
 
 var Script = process.binding('evals').Script;
 
-var jsonUrl = "server.json";
-
-// this should define window._renderServerSide(serverSideJson);
-var serverUrl = "yourServerSide.js";
-var templateUrl = "index.html";
-
-
 
 var readFiles = function (files, whenDone) {
     // readFiles (file, whenDone(theErrs, theDatas)) reads many files at once, 
@@ -61,15 +54,6 @@ var readFiles = function (files, whenDone) {
 
 }
 
-
-
-// TODO: allow passing in a list of .js files to run server side.
-var theFileNames = [__dirname + "/jquery.js", 
-			__dirname + "/" + serverUrl, 
-			__dirname + "/" + templateUrl, 
-			__dirname + "/" + jsonUrl];
-
-
 var extractDoctype = function (htmlData)  {
 	var html = htmlData + "";
 	var idx = html.indexOf('<html');
@@ -79,69 +63,110 @@ var extractDoctype = function (htmlData)  {
 	return html.substr(0, idx);
 }
 
-// TODO LATER: cache files if we have already read them.  Not too slow for now.
-readFiles(theFileNames, function (theErrs, theDatas) {
-
-	var data = theDatas[theFileNames[0]];
-	var serverSideData = theDatas[theFileNames[1]];
-	var htmlData = theDatas[theFileNames[2]];
-	var jsonData = theDatas[theFileNames[3]];
-
-        //HACK TODO: extract the doctype from the document... since it is not output by the dom.
-	// extract everything before '<html'
-	var docType = extractDoctype(htmlData);
 
 
-	//sys.puts(data);
-
-	//window.location.href = templateUrl;
-
-	//TODO: cache json if we have already parsed it.
-	var serverSideJson = JSON.parse(jsonData); 
 
 
-	//TODO: cache html parsing.
-	// Load the html in.
-	//window.document.innerHTML = "<!DOCTYPE html>\n<html> <body> hi there.  </body> </html>";
-	window.document.innerHTML = htmlData;
+var jsonUrl = "server.json";
+
+// this should define window._renderServerSide(serverSideJson);
+var serverUrl = "yourServerSide.js";
+var templateUrl = "index.html";
 
 
-	var env = {	window: window, 
-			location: window.location, 
-			navigator: window.navigator,
-			"$" : window.jQuery };
-
-        //TODO: cache Context based on which libraries are used.
-	// eg, if just json changes, we should be fairly quick to already have jquery, and other libs loaded.
-	try {
-		Script.runInNewContext(data.toString() + serverSideData.toString(), env);
-	} catch(e){
-		sys.puts(sys.inspect(e));
-	}
+// TODO: allow passing in a list of .js files to run server side.
+var theFileNames = [__dirname + "/jquery.js", 
+			__dirname + "/" + serverUrl, 
+			__dirname + "/" + templateUrl, 
+			__dirname + "/" + jsonUrl];
 
 
-	//TODO: should this run the onload onready events instead?
-	window._renderServerSide(serverSideJson);
+
+var doIt = function (outPut) {
+	// TODO LATER: cache files if we have already read them.  Not too slow for now.
+	readFiles(theFileNames, function (theErrs, theDatas) {
+
+		var data = theDatas[theFileNames[0]];
+		var serverSideData = theDatas[theFileNames[1]];
+		var htmlData = theDatas[theFileNames[2]];
+		var jsonData = theDatas[theFileNames[3]];
+
+		//HACK TODO: extract the doctype from the document... since it is not output by the dom.
+		// extract everything before '<html'
+		var docType = extractDoctype(htmlData);
 
 
-	// To tell the client side we have processed the script server side already.
-	// TODO: this fails with an error...
-	//window.jQuery('body').append("<script type='text/javascript'>window._processedServerSide = true;</script>");
+		//sys.puts(data);
 
-	//TODO: can use the dom directly to create the output html?
-	var outputHtml = window.document.outerHTML;
-	//var outputHtml = domToHtml(window.document);
-	//docType = window.document.doctype;
+		//window.location.href = templateUrl;
+
+		//TODO: cache json if we have already parsed it.
+		var serverSideJson = JSON.parse(jsonData); 
 
 
-	//HACK: since the doc type is not output, we add it in here.
-	outputHtml = docType + outputHtml;
-	//HACK: since the above .append does not work, we hack it in here.
-	outputHtml = outputHtml.replace('</body>', "<script type='text/javascript'>window._processedServerSide = true;</script>\n</body>");
-	sys.puts(outputHtml);
+		//TODO: cache html parsing.
+		// Load the html in.
+		//window.document.innerHTML = "<!DOCTYPE html>\n<html> <body> hi there.  </body> </html>";
+		window.document.innerHTML = htmlData;
 
 
-});
+		var env = {	window: window, 
+				location: window.location, 
+				navigator: window.navigator,
+				"$" : window.jQuery };
+
+		//TODO: cache Context based on which libraries are used.
+		// eg, if just json changes, we should be fairly quick to already have jquery, and other libs loaded.
+		try {
+			Script.runInNewContext(data.toString() + serverSideData.toString(), env);
+		} catch(e){
+			sys.puts(sys.inspect(e));
+		}
 
 
+		//TODO: should this run the onload onready events instead?
+		window._renderServerSide(serverSideJson);
+
+
+		// To tell the client side we have processed the script server side already.
+		// TODO: this fails with an error...
+		//window.jQuery('body').append("<script type='text/javascript'>window._processedServerSide = true;</script>");
+
+		//TODO: can use the dom directly to create the output html?
+		var outputHtml = window.document.outerHTML;
+		//var outputHtml = domToHtml(window.document);
+		//docType = window.document.doctype;
+
+
+		//HACK: since the doc type is not output, we add it in here.
+		outputHtml = docType + outputHtml;
+		//HACK: since the above .append does not work, we hack it in here.
+		outputHtml = outputHtml.replace('</body>', "<script type='text/javascript'>window._processedServerSide = true;</script>\n</body>");
+		//sys.puts(outputHtml);
+		outPut(outputHtml);
+
+	});
+
+}
+
+
+
+if (0) {
+	var http = require('http');
+	http.createServer(function (req, res) {
+		res.writeHead(200, {'Content-Type': 'text/html'});
+		//res.end('Hello World\n');
+		doIt(function (data) {
+			res.end(data);
+		});
+
+	}).listen(8124, "127.0.0.1");
+	console.log('Server running at http://127.0.0.1:8124/');
+} else {
+	doIt(function (data) {
+		sys.puts(data);
+
+	});
+
+}
 
