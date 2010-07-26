@@ -16,12 +16,6 @@ var sys = require("sys"), fs = require("fs");
 var htmlparser = require("node-htmlparser/node-htmlparser");
 
 
-var dom = require("jsdom/level1/core").dom.level1.core;
-var window = require("jsdom/browser").windowAugmentation(dom).window;
-var domToHtml = require("jsdom/browser/domtohtml").domToHtml;
-
-var Script = process.binding('evals').Script;
-
 
 var readFiles = function (files, whenDone) {
     // readFiles (file, whenDone(theErrs, theDatas)) reads many files at once, 
@@ -85,6 +79,13 @@ var theFileNames = [__dirname + "/jquery.js",
 var doIt = function (outPut) {
 	// TODO LATER: cache files if we have already read them.  Not too slow for now.
 	readFiles(theFileNames, function (theErrs, theDatas) {
+
+		var dom = require("jsdom/level1/core").dom.level1.core;
+		var window = require("jsdom/browser").windowAugmentation(dom).window;
+		var domToHtml = require("jsdom/browser/domtohtml").domToHtml;
+		var Script = process.binding('evals').Script;
+
+
 
 		var data = theDatas[theFileNames[0]];
 		var serverSideData = theDatas[theFileNames[1]];
@@ -151,14 +152,18 @@ var doIt = function (outPut) {
 
 
 
+//TODO: Seems to be a massive memory leak.
+
 if (0) {
 	var http = require('http');
 	http.createServer(function (req, res) {
 		res.writeHead(200, {'Content-Type': 'text/html'});
 		//res.end('Hello World\n');
-		doIt(function (data) {
-			res.end(data);
-		});
+		(function () {
+			doIt(function (data) {
+				res.end(data);
+			});
+		})();
 
 	}).listen(8124, "127.0.0.1");
 	console.log('Server running at http://127.0.0.1:8124/');
