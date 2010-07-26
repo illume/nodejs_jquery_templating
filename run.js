@@ -61,22 +61,10 @@ var extractDoctype = function (htmlData)  {
 
 
 
-var jsonUrl = "server.json";
-
-// this should define window._renderServerSide(serverSideJson);
-var serverUrl = "yourServerSide.js";
-var templateUrl = "index.html";
-
-
-// TODO: allow passing in a list of .js files to run server side.
-var theFileNames = [__dirname + "/jquery.js", 
-			__dirname + "/" + serverUrl, 
-			__dirname + "/" + templateUrl, 
-			__dirname + "/" + jsonUrl];
 
 
 
-var doIt = function (outPut) {
+var doIt = function (theFileNames, outPut) {
 	// TODO LATER: cache files if we have already read them.  Not too slow for now.
 	readFiles(theFileNames, function (theErrs, theDatas) {
 
@@ -152,26 +140,80 @@ var doIt = function (outPut) {
 
 
 
-//TODO: Seems to be a massive memory leak.
+if (1) {
+	// Run, then exit.
 
-if (0) {
+	var jsonUrl = "server.json";
+	// this should define window._renderServerSide(serverSideJson);
+	var serverUrl = "yourServerSide.js";
+	var templateUrl = "index.html";
+
+
+	// TODO: allow passing in a list of .js files to run server side.
+	var theFileNames = [__dirname + "/jquery.js", 
+				__dirname + "/" + serverUrl, 
+				__dirname + "/" + templateUrl, 
+				__dirname + "/" + jsonUrl];
+
+	//sys.puts(JSON.stringify(theFileNames));
+
+	doIt(theFileNames, function (data) {
+		sys.puts(data);
+	});
+
+} else {
+	// run as a server.
 	var http = require('http');
 	http.createServer(function (req, res) {
-		res.writeHead(200, {'Content-Type': 'text/html'});
-		//res.end('Hello World\n');
-		(function () {
-			doIt(function (data) {
+
+		var reqp= require('url').parse(req.url, true);
+
+		if(reqp.pathname === "/") {
+			var jsonUrl = "server.json";
+
+			// this should define window._renderServerSide(serverSideJson);
+			var serverUrl = "yourServerSide.js";
+			var templateUrl = "index.html";
+
+			// 
+			//sys.puts(req.url)
+			//sys.puts(JSON.stringify(urlDetails));
+			//sys.puts(JSON.stringify( require('url').parse('/status?name=ryan', true)));
+
+			var jsonUrl = reqp.query.serverJson;
+			var serverUrl = reqp.query.serverJs;
+			var templateUrl = reqp.query.templateUrl;
+
+			// TODO: allow passing in a list of .js files to run server side.
+			var theFileNames = [__dirname + "/jquery.js", 
+						__dirname + "/" + serverUrl, 
+						__dirname + "/" + templateUrl, 
+						__dirname + "/" + jsonUrl];
+			//sys.puts(JSON.stringify(theFileNames));
+
+			res.writeHead(200, {'Content-Type': 'text/html'});
+			//res.end('Hello World\n');
+			(function () {
+				doIt(theFileNames, function (data) {
+					res.end(data);
+				});
+			})();
+		} else if (reqp.pathname == "/jquery.js" || reqp.pathname == "/yourServerSide.js") {
+			
+			fs.readFile(__dirname + reqp.pathname, function (err, data) {
+				res.writeHead(200, {'Content-Type': 'text/json'});
 				res.end(data);
 			});
-		})();
-
+			
+		} else {
+			res.writeHead(404, {'Content-Type': 'text/html'});
+			res.end("not found")
+		}
 	}).listen(8124, "127.0.0.1");
 	console.log('Server running at http://127.0.0.1:8124/');
-} else {
-	doIt(function (data) {
-		sys.puts(data);
+	console.log('try url: http://localhost:8124/serverJson=server.json&serverJs=yourServerSide.js&templateUrl=index.html')
 
-	});
+
 
 }
 

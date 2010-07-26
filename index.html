@@ -15,14 +15,14 @@ hi there.
 <script type="text/javascript">
 	$(document).ready(function(){
 
-		var sampleJSON = 'sample.json';
+		var clientJSON = 'client.json';
 		var yourReadyCode = function () {
 			// Rest of your code here.
 			$('.result2').text('this is from the client side');
 		};
 
 		if(window._processedServerSide === undefined) {
-			$.getJSON(sampleJSON, function(data) {
+			$.getJSON(clientJSON, function(data) {
 				window._renderServerSide(data);
 				yourReadyCode();
 			});

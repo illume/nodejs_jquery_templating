@@ -32,7 +32,7 @@ To process the data on the server side.
 
 Put your server side templating code in yourServerSide.js
 
-- sample.json is given to your function in yourServerSide on the client side.
+- client.json is given to your function in yourServerSide on the client side.
 
 - server.json is given to server side version of the function.
 
