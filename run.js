@@ -69,7 +69,7 @@ var extractDoctype = function (htmlData)  {
 
 
 
-var doIt = function (jsonFile, serverJsFiles, htmlFile, outPutFunc) {
+var bakeHtml = function (jsonFile, serverJsFiles, htmlFile, outPutFunc) {
 
 	var theFileNames = [htmlFile, jsonFile];
 
@@ -156,6 +156,15 @@ var doIt = function (jsonFile, serverJsFiles, htmlFile, outPutFunc) {
 }
 
 
+
+
+
+
+
+
+
+var basePath = __dirname;
+
 var runAsServer = false;
 if (process.argv.length === 3 && process.argv[2] == "--server") {
 	runAsServer = true;
@@ -163,12 +172,14 @@ if (process.argv.length === 3 && process.argv[2] == "--server") {
 
 if (!runAsServer) {
 
-	var jsonFile = __dirname + "/server.json";
+	//TODO: get the files to use from the command line argument.
+	
+	var jsonFile = basePath + "/server.json";
 	// this should define window._renderServerSide(serverSideJson);
-	var serverJsFiles = [__dirname + "/jquery.js", __dirname + "/yourServerSide.js"];
-	var htmlFile = __dirname + "/" + "index.html";
+	var serverJsFiles = [basePath + "/jquery.js", basePath + "/yourServerSide.js"];
+	var htmlFile = basePath + "/" + "index.html";
 
-	doIt(jsonFile, serverJsFiles, htmlFile, function (data) {
+	bakeHtml(jsonFile, serverJsFiles, htmlFile, function (data) {
 		sys.puts(data);
 	});
 
@@ -180,6 +191,11 @@ if (!runAsServer) {
 		var reqp= require('url').parse(req.url, true);
 
 		if(reqp.pathname === "/") {
+			
+			// TODO: check the file paths are within the basePath.
+			
+			
+			// TODO: check the paths are within the basePath.
 			var jsonUrl = reqp.query.serverJson;
 			var serverJs = reqp.query.serverJs + "";
 			var templateUrl = reqp.query.templateUrl;
@@ -187,13 +203,13 @@ if (!runAsServer) {
 			// Can specify a list of serverJs files by separating them with ',,,'.
 			var serverJses = serverJs.split(",,,")
 
-			var jsonFile = __dirname + "/" + jsonUrl;
-			var serverJsFiles = [__dirname + "/jquery.js"];
+			var jsonFile = basePath + "/" + jsonUrl;
+			var serverJsFiles = [basePath + "/jquery.js"];
 			for(var ii=0; ii < serverJses.length; ii +=1) {
-				serverJsFiles.push(__dirname + "/" + serverJses[ii]);
+				serverJsFiles.push(basePath + "/" + serverJses[ii]);
 			}
 
-			var htmlFile = __dirname + "/" + templateUrl;
+			var htmlFile = basePath + "/" + templateUrl;
 
 			/*
 			sys.puts(JSON.stringify(jsonFile));
@@ -203,13 +219,13 @@ if (!runAsServer) {
 
 			res.writeHead(200, {'Content-Type': 'text/html'});
 			(function () {
-				doIt(jsonFile, serverJsFiles, htmlFile, function (data) {
+				bakeHtml(jsonFile, serverJsFiles, htmlFile, function (data) {
 					res.end(data);
 				});
 			})();
 		} else if (reqp.pathname == "/jquery.js" || reqp.pathname == "/yourServerSide.js") {
 			
-			fs.readFile(__dirname + reqp.pathname, function (err, data) {
+			fs.readFile(basePath + reqp.pathname, function (err, data) {
 				res.writeHead(200, {'Content-Type': 'text/json'});
 				res.end(data);
 			});
