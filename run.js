@@ -181,11 +181,18 @@ if (!runAsServer) {
 
 		if(reqp.pathname === "/") {
 			var jsonUrl = reqp.query.serverJson;
-			var serverJs = reqp.query.serverJs;
+			var serverJs = reqp.query.serverJs + "";
 			var templateUrl = reqp.query.templateUrl;
 
+			// Can specify a list of serverJs files by separating them with ',,,'.
+			var serverJses = serverJs.split(",,,")
+
 			var jsonFile = __dirname + "/" + jsonUrl;
-			var serverJsFiles = [__dirname + "/jquery.js", __dirname + "/" + serverJs];
+			var serverJsFiles = [__dirname + "/jquery.js"];
+			for(var ii=0; ii < serverJses.length; ii +=1) {
+				serverJsFiles.push(__dirname + "/" + serverJses[ii]);
+			}
+
 			var htmlFile = __dirname + "/" + templateUrl;
 
 			/*
@@ -213,7 +220,7 @@ if (!runAsServer) {
 		}
 	}).listen(8124, "127.0.0.1");
 	console.log('Server running at http://127.0.0.1:8124/');
-	console.log('try url: http://localhost:8124/?serverJson=server.json&serverJs=yourServerSide.js&templateUrl=index.html')
+	console.log('try url: http://localhost:8124/?serverJson=server.json&serverJs=yourServerSide.js,,,yourServerSide2.js&templateUrl=index.html')
 
 }
 

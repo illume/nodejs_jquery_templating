@@ -2,6 +2,12 @@ For template processing using javascript (with jquery) on the server side or the
 
 Uses nodejs for the javascript interpreter, and jquery for the template language, along with jsdom and node-htmlparser for the DOM and html parsing/serialising.
 
+Still alpha prototype software.
+===============================
+
+This is still alpha software, not to be used in production.
+
+
 Why is this useful?
 ===================
 
@@ -32,10 +38,10 @@ To process the data on the server side:
 To run as a server:
     node run.js --server
 Open your browser to:
-    http://localhost:8124/?serverJson=server.json&serverJs=yourServerSide.js&templateUrl=index.html
+    http://localhost:8124/?serverJson=server.json&serverJs=yourServerSide.js,,,yourServerSide2.js&templateUrl=index.html
 
 
-Put your server side templating code in yourServerSide.js
+- yourServerSide.js and yourServerSide2.js are where your server side code goes.
 
 - client.json is given to your function in yourServerSide on the client side.
 
