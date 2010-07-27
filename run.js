@@ -143,7 +143,7 @@ var bakeHtml = function (jsonFile, serverJsFiles, htmlFile, outPutFunc) {
 
 
 		//TODO: should this run the onload onready events instead?
-		if (window._renderServerSide) {
+		if (window._renderServerSide !== undefined) {
 			window._renderServerSide(serverSideJson);
 		}
 		//window.load();
