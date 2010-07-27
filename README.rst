@@ -44,7 +44,7 @@ Open your browser to:
 
 - client.json is given to your function in yourServerSide on the client side.
 
-- server.json is given to server side version of the function.
+- server.json is given to server side version of the function.  It appears in window._jsonData.
 
 
 

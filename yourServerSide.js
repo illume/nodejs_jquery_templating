@@ -1,7 +1,6 @@
 
-$ = window.jQuery;
-window._renderServerSide = function (data) {
+$(document).ready(function(){
+	$('.result').text(window._jsonData.foo);
+});
+~                                                                                                        
 
-    $('.result').text(data.foo);
-
-}

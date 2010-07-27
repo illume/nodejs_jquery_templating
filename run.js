@@ -126,6 +126,7 @@ var bakeHtml = function (jsonFile, serverJsFiles, htmlFile, outPutFunc) {
 		// Load the html in.
 		//window.document.innerHTML = "<!DOCTYPE html>\n<html> <body> hi there.  </body> </html>";
 		window.document.innerHTML = htmlData;
+		window._jsonData = serverSideJson;
 
 
 		var env = {	window: window, 
@@ -143,9 +144,9 @@ var bakeHtml = function (jsonFile, serverJsFiles, htmlFile, outPutFunc) {
 
 
 		//TODO: should this run the onload onready events instead?
-		if (window._renderServerSide !== undefined) {
-			window._renderServerSide(serverSideJson);
-		}
+		//if (window._renderServerSide !== undefined) {
+		//	window._renderServerSide(serverSideJson);
+		//}
 		//window.load();
 
 
