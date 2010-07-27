@@ -17,7 +17,7 @@ hi there.
 <!--  Load jquery, and any other of your server side scripts first.   -->
 <script type="text/javascript" src="jquery.js">
 </script>
-<script type="text/javascript" id="ourServerSide">
+<script type="text/javascript">
 	// Check if we have been processed server side or not.
 	if(window._processedServerSide === undefined) {
 		// We should be client side, so fetch the json.
@@ -27,9 +27,9 @@ hi there.
 			//     is put there by the server.
 			window._jsonData = data;
 		});
-		function loadScript(url) {
-			document.write('<' + 'script src="', url, '" type="text/javascript">
-</' + 'script>');
+		var loadScript = function (url) {
+			document.write('<' + 'script src="', url, '" type="text/javascript"' + '>
+<' + '/' + 'script' + '>');
 		}
 		// Your server side scripts get run on client side if not processed on server side.
 		loadScript('yourServerSide.js');
