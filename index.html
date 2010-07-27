@@ -15,12 +15,14 @@ hi there.
 	// Check if we have been processed server side or not.
 	if(window._processedServerSide === undefined) {
 		// We should be client side, so fetch the json.
+		// Note, you can skip the json loading if you do not need to use json.
 		var clientJSON = 'client.json';
 		$.getJSON(clientJSON, function(data) {
 			// When processed on the server side window._jsonData 
 			//     is put there by the server.
 			window._jsonData = data;
 		});
+
 		var loadScript = function (url) {
 			document.write('<' + 'script src="', url, '" type="text/javascript"' + '><' + '/' + 'script' + '>');
 		}
