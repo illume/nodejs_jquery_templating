@@ -95,14 +95,23 @@ var bakeHtml = function (jsonFile, serverJsFiles, htmlFile, outPutFunc) {
 		// concat all of the .js into one big string.
 		jsData = [];
 		jsDataString = "";
+		jsDataString += "\ndocument = window.document;\n";
+
 		for(var i=2;i < theFileNames.length;i += 1) {
-			var aData = theDatas[theFileNames[i]];
+			var aFileName = theFileNames[i];
+			var aData = theDatas[aFileName];
 			jsData.push(aData);
 			jsDataString += aData.toString();
+			// HACK: After jquery is loaded... we tell jquery the DOM is ready.
+			//if(aFileName.indexOf("jquery.js") !== -1) {
+			if(i == 2 && (aFileName.indexOf("jquery") !== -1)) {
+				jsDataString += "\n$ = window.jQuery;\n";
+				jsDataString += "\nwindow.jQuery.isReady=true;\n";
+			}
 		}
 
 
-		//HACK TODO: extract the doctype from the document... since it is not output by the dom.
+		//HACK Extract the doctype from the document... since it is not output by the dom.
 		// extract everything before '<html'
 		var docType = extractDoctype(htmlData);
 
@@ -134,7 +143,10 @@ var bakeHtml = function (jsonFile, serverJsFiles, htmlFile, outPutFunc) {
 
 
 		//TODO: should this run the onload onready events instead?
-		window._renderServerSide(serverSideJson);
+		if (window._renderServerSide) {
+			window._renderServerSide(serverSideJson);
+		}
+		//window.load();
 
 
 		// To tell the client side we have processed the script server side already.
