@@ -9,29 +9,29 @@ hi there.
 <div class="result2"></div>
 
 
-
+<!-- Load jquery, and any other of your server side scripts first.  -->
 <script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript">
+	// Check if we have been processed server side or not.
+	if(window._processedServerSide === undefined) {
+		// We should be client side, so fetch the json.
+		var clientJSON = 'client.json';
+		$.getJSON(clientJSON, function(data) {
+			// When processed on the server side window._jsonData 
+			//     is put there by the server.
+			window._jsonData = data;
+		});
+	}
+</script>
 <script type="text/javascript" src="yourServerSide.js"></script>
+<script type="text/javascript" src="yourServerSide2.js"></script>
+
+
+
+<!-- Load your non-server side stuff afterwards.  -->
 <script type="text/javascript">
 	$(document).ready(function(){
-
-		var clientJSON = 'client.json';
-		var yourReadyCode = function () {
-			// Rest of your code here.
-			$('.result2').text('this is from the client side');
-		};
-
-		if(window._processedServerSide === undefined) {
-			// We have not processed it server side, so we run it client side.
-			$.getJSON(clientJSON, function(data) {
-				window._renderServerSide(data);
-				yourReadyCode();
-			});
-		} else {
-			yourReadyCode();
-		}
-
-
+		$('.result2').text('this is from the client side');
 	});
 
 </script>

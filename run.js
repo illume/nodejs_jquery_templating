@@ -138,21 +138,14 @@ var bakeHtml = function (jsonFile, serverJsFiles, htmlFile, outPutFunc) {
 		// eg, if just json changes, we should be fairly quick to already have jquery, and other libs loaded.
 		try {
 			Script.runInNewContext(jsDataString, env);
-		} catch(e){
+		} catch(e) {
 			sys.puts(sys.inspect(e));
 		}
 
 
-		//TODO: should this run the onload onready events instead?
-		//if (window._renderServerSide !== undefined) {
-		//	window._renderServerSide(serverSideJson);
-		//}
-		//window.load();
-
-
 		// To tell the client side we have processed the script server side already.
 		// TODO: this fails with an error...
-		//window.jQuery('body').append("<script type='text/javascript'>window._processedServerSide = true;</script>");
+		//window.jQuery('body').append("<script type='text/javascript'>\nwindow._processedServerSide = true;\n</script>");
 
 		//TODO: can use the dom directly to create the output html?
 		var outputHtml = window.document.outerHTML;
@@ -163,7 +156,7 @@ var bakeHtml = function (jsonFile, serverJsFiles, htmlFile, outPutFunc) {
 		//HACK: since the doc type is not output, we add it in here.
 		outputHtml = docType + outputHtml;
 		//HACK: since the above .append does not work, we hack it in here.
-		outputHtml = outputHtml.replace('</body>', "<script type='text/javascript'>window._processedServerSide = true;</script>\n</body>");
+		outputHtml = outputHtml.replace('<body>', "<body>\n<script type='text/javascript'>\nwindow._processedServerSide = true;\n</script>\n");
 		//sys.puts(outputHtml);
 		outPutFunc(outputHtml);
 
