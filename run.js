@@ -53,6 +53,7 @@ var readFiles = function (files, whenDone) {
 }
 
 var extractDoctype = function (htmlData)  {
+	// extractDoctype() returns everything before the <html tag.
 	var html = htmlData + "";
 	var idx = html.indexOf('<html');
 	if (idx === -1) {
@@ -68,8 +69,16 @@ var extractDoctype = function (htmlData)  {
 
 
 
-var doIt = function (theFileNames, outPut) {
-	// TODO LATER: cache files if we have already read them.  Not too slow for now.
+var doIt = function (jsonFile, serverJsFiles, htmlFile, outPutFunc) {
+
+	var theFileNames = [htmlFile, jsonFile];
+
+	for(var ii=0;ii < serverJsFiles.length;ii += 1) {
+		theFileNames.push(serverJsFiles[ii]);
+	}
+
+
+	// TODO LATER: cache reading files if we have already read them.  Not too slow for now.
 	readFiles(theFileNames, function (theErrs, theDatas) {
 
 		var dom = require("jsdom/level1/core").dom.level1.core;
@@ -78,18 +87,23 @@ var doIt = function (theFileNames, outPut) {
 		var Script = process.binding('evals').Script;
 
 
+		var htmlData = theDatas[theFileNames[0]];
+		var jsonData = theDatas[theFileNames[1]];
 
-		var data = theDatas[theFileNames[0]];
-		var serverSideData = theDatas[theFileNames[1]];
-		var htmlData = theDatas[theFileNames[2]];
-		var jsonData = theDatas[theFileNames[3]];
+		// concat all of the .js into one big string.
+		jsData = [];
+		jsDataString = "";
+		for(var i=2;i < theFileNames.length;i += 1) {
+			var aData = theDatas[theFileNames[i]];
+			jsData.push(aData);
+			jsDataString += aData.toString();
+		}
+
 
 		//HACK TODO: extract the doctype from the document... since it is not output by the dom.
 		// extract everything before '<html'
 		var docType = extractDoctype(htmlData);
 
-
-		//sys.puts(data);
 
 		//window.location.href = templateUrl;
 
@@ -111,7 +125,7 @@ var doIt = function (theFileNames, outPut) {
 		//TODO: cache Context based on which libraries are used.
 		// eg, if just json changes, we should be fairly quick to already have jquery, and other libs loaded.
 		try {
-			Script.runInNewContext(data.toString() + serverSideData.toString(), env);
+			Script.runInNewContext(jsDataString, env);
 		} catch(e){
 			sys.puts(sys.inspect(e));
 		}
@@ -136,10 +150,9 @@ var doIt = function (theFileNames, outPut) {
 		//HACK: since the above .append does not work, we hack it in here.
 		outputHtml = outputHtml.replace('</body>', "<script type='text/javascript'>window._processedServerSide = true;</script>\n</body>");
 		//sys.puts(outputHtml);
-		outPut(outputHtml);
+		outPutFunc(outputHtml);
 
 	});
-
 }
 
 
@@ -149,23 +162,13 @@ if (process.argv.length === 3 && process.argv[2] == "--server") {
 }
 
 if (!runAsServer) {
-	// Run, then exit.
 
-	var jsonUrl = "server.json";
+	var jsonFile = __dirname + "/server.json";
 	// this should define window._renderServerSide(serverSideJson);
-	var serverUrl = "yourServerSide.js";
-	var templateUrl = "index.html";
+	var serverJsFiles = [__dirname + "/jquery.js", __dirname + "/yourServerSide.js"];
+	var htmlFile = __dirname + "/" + "index.html";
 
-
-	// TODO: allow passing in a list of .js files to run server side.
-	var theFileNames = [__dirname + "/jquery.js", 
-				__dirname + "/" + serverUrl, 
-				__dirname + "/" + templateUrl, 
-				__dirname + "/" + jsonUrl];
-
-	//sys.puts(JSON.stringify(theFileNames));
-
-	doIt(theFileNames, function (data) {
+	doIt(jsonFile, serverJsFiles, htmlFile, function (data) {
 		sys.puts(data);
 	});
 
@@ -177,32 +180,23 @@ if (!runAsServer) {
 		var reqp= require('url').parse(req.url, true);
 
 		if(reqp.pathname === "/") {
-			var jsonUrl = "server.json";
-
-			// this should define window._renderServerSide(serverSideJson);
-			var serverUrl = "yourServerSide.js";
-			var templateUrl = "index.html";
-
-			// 
-			//sys.puts(req.url)
-			//sys.puts(JSON.stringify(urlDetails));
-			//sys.puts(JSON.stringify( require('url').parse('/status?name=ryan', true)));
-
 			var jsonUrl = reqp.query.serverJson;
-			var serverUrl = reqp.query.serverJs;
+			var serverJs = reqp.query.serverJs;
 			var templateUrl = reqp.query.templateUrl;
 
-			// TODO: allow passing in a list of .js files to run server side.
-			var theFileNames = [__dirname + "/jquery.js", 
-						__dirname + "/" + serverUrl, 
-						__dirname + "/" + templateUrl, 
-						__dirname + "/" + jsonUrl];
-			//sys.puts(JSON.stringify(theFileNames));
+			var jsonFile = __dirname + "/" + jsonUrl;
+			var serverJsFiles = [__dirname + "/jquery.js", __dirname + "/" + serverJs];
+			var htmlFile = __dirname + "/" + templateUrl;
+
+			/*
+			sys.puts(JSON.stringify(jsonFile));
+			sys.puts(JSON.stringify(serverJsFiles));
+			sys.puts(JSON.stringify(htmlFile));
+			*/
 
 			res.writeHead(200, {'Content-Type': 'text/html'});
-			//res.end('Hello World\n');
 			(function () {
-				doIt(theFileNames, function (data) {
+				doIt(jsonFile, serverJsFiles, htmlFile, function (data) {
 					res.end(data);
 				});
 			})();
