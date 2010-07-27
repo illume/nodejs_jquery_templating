@@ -1,6 +1,8 @@
 
 // To output to stdout:
 // 	node run.js
+//	node run.js ./ server.json index.html jquery.js yourServerSide.js yourServerSide2.js
+//	node run.js basePath jsonFile htmlFile serverSideJsFiles
 // To run as a server:
 // 	node run.js --server
 
@@ -164,6 +166,7 @@ var bakeHtml = function (jsonFile, serverJsFiles, htmlFile, outPutFunc) {
 
 
 var basePath = __dirname;
+var basePath = "./";
 
 var runAsServer = false;
 if (process.argv.length === 3 && process.argv[2] == "--server") {
@@ -172,12 +175,28 @@ if (process.argv.length === 3 && process.argv[2] == "--server") {
 
 if (!runAsServer) {
 
-	//TODO: get the files to use from the command line argument.
-	
-	var jsonFile = basePath + "/server.json";
-	// this should define window._renderServerSide(serverSideJson);
-	var serverJsFiles = [basePath + "/jquery.js", basePath + "/yourServerSide.js"];
-	var htmlFile = basePath + "/" + "index.html";
+	// Get the files to use from the command line arguments.
+	if(process.argv.length > 4) {
+		var basePath = process.argv[2];
+		var jsonFile = basePath + "/" + process.argv[3];
+		var htmlFile = basePath + "/" + process.argv[4];
+		var serverJses = process.argv.slice(5);
+		var serverJsFiles = [];
+		for(var ii=0; ii < serverJses.length; ii +=1) {
+			serverJsFiles.push(basePath + "/" + serverJses[ii]);
+		}
+
+	} else {
+		var jsonFile = basePath + "/server.json";
+		var htmlFile = basePath + "/" + "index.html";
+		// this should define window._renderServerSide(serverSideJson);
+		var serverJsFiles = [basePath + "/jquery.js", basePath + "/yourServerSide.js"];
+	}
+
+	/*sys.puts(JSON.stringify(jsonFile));
+	sys.puts(JSON.stringify(htmlFile));
+	sys.puts(JSON.stringify(serverJsFiles));
+	*/
 
 	bakeHtml(jsonFile, serverJsFiles, htmlFile, function (data) {
 		sys.puts(data);
@@ -196,6 +215,7 @@ if (!runAsServer) {
 			
 			
 			// TODO: check the paths are within the basePath.
+			var basePath = reqp.query.basePath;
 			var jsonUrl = reqp.query.serverJson;
 			var serverJs = reqp.query.serverJs + "";
 			var templateUrl = reqp.query.templateUrl;
@@ -204,7 +224,7 @@ if (!runAsServer) {
 			var serverJses = serverJs.split(",,,")
 
 			var jsonFile = basePath + "/" + jsonUrl;
-			var serverJsFiles = [basePath + "/jquery.js"];
+			var serverJsFiles = [];
 			for(var ii=0; ii < serverJses.length; ii +=1) {
 				serverJsFiles.push(basePath + "/" + serverJses[ii]);
 			}
@@ -223,12 +243,6 @@ if (!runAsServer) {
 					res.end(data);
 				});
 			})();
-		} else if (reqp.pathname == "/jquery.js" || reqp.pathname == "/yourServerSide.js") {
-			
-			fs.readFile(basePath + reqp.pathname, function (err, data) {
-				res.writeHead(200, {'Content-Type': 'text/json'});
-				res.end(data);
-			});
 			
 		} else {
 			res.writeHead(404, {'Content-Type': 'text/html'});
@@ -236,7 +250,7 @@ if (!runAsServer) {
 		}
 	}).listen(8124, "127.0.0.1");
 	console.log('Server running at http://127.0.0.1:8124/');
-	console.log('try url: http://localhost:8124/?serverJson=server.json&serverJs=yourServerSide.js,,,yourServerSide2.js&templateUrl=index.html')
+	console.log('try url: http://localhost:8124/?basePath=./&serverJson=server.json&serverJs=jquery.js,,,yourServerSide.js,,,yourServerSide2.js&templateUrl=index.html')
 
 }
 

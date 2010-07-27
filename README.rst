@@ -33,13 +33,12 @@ How to run.
 Look at index.html in your browser, to process client side.
 
 To process the data on the server side:
-    node run.js > processed_index.html
+    node run.js ./ server.json index.html jquery.js yourServerSide.js yourServerSide2.js > processed_index.html
 
 To run as a server:
     node run.js --server
 Open your browser to:
-    http://localhost:8124/?serverJson=server.json&serverJs=yourServerSide.js,,,yourServerSide2.js&templateUrl=index.html
-
+    http://localhost:8124/?basePath=./&serverJson=server.json&serverJs=jquery.js,,,yourServerSide.js,,,yourServerSide2.js&templateUrl=index.html
 
 - yourServerSide.js and yourServerSide2.js are where your server side code goes.
 
